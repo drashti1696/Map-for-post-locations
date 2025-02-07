@@ -68,12 +68,14 @@ function show_map($atts){
             
             $address[] = $meta_value;
             $titles[] = $post->post_title;
+            $links[] = get_the_permalink($post->ID);
         }
     }
 
     if(!empty($address) && !empty($titles)){
         $addresses = json_encode($address);
         $titles = json_encode($titles);
+        $links = json_encode($links);
     }
 
 
@@ -98,6 +100,9 @@ function show_map($atts){
             <?php if(!empty($titles)) {?>
              var titles = <?php echo $titles; ?>;
              <?php } ?>
+            <?php if(!empty($links)) {?>
+             var links = <?php echo $links; ?>;
+             <?php } ?>
             
             
             if(typeof addresses !== "undefined"){
@@ -107,7 +112,7 @@ function show_map($atts){
                 }).addTo(map);
             }
             
-            function geocodeAddress(address, title) {
+            function geocodeAddress(address, title, link) {
                 
                 var url = 'https://nominatim.openstreetmap.org/search?format=json&q='+address+'';
                 // var url = 'https://api.opencagedata.com/geocode/v1/json?q='+address+'&key=c97eb41e8d2a40aa93f5424abf46ce83';
@@ -126,7 +131,7 @@ function show_map($atts){
                             map.setView([lat, lon], 7);
 
                             // marker and popup
-                            L.marker([lat, lon]).addTo(map).bindPopup('Article:'+title)
+                            L.marker([lat, lon]).addTo(map).bindPopup('<a href="'+link+'" >'+title+'</a>')
                             .openPopup();
                     
                         } else {
@@ -139,8 +144,9 @@ function show_map($atts){
             if(typeof addresses !== "undefined"){
                   addresses.forEach((address, index) => {
                     var title = titles[index]; 
+                    var link = links[index]; 
                     // console.log(title);
-                    geocodeAddress(address, title);
+                    geocodeAddress(address, title, link);
                 });
             }
               
